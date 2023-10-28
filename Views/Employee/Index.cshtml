@@ -1,0 +1,159 @@
+﻿@using Task.Helper;
+@model List<EmployeeVM>
+@inject UserManager<AppUser> usermanage
+@{
+    var us = new UserHelper(usermanage);
+    var roles = us.Roles();
+}
+<style>
+    .page-i{
+        font-size:20px
+    }
+</style>
+
+    @if(Model.Count >0 ){
+        <div class="container">
+
+        <div class="row">
+            <!-- DataTable with Hover -->
+            <div class="col-lg-12">
+                <div class="card mb-4">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                     <h2 class="h2 text-center p-4"> Employees </h2>
+                      
+                    </div>
+                    <div class="text-danger text-center" id="error-msg"> </div>
+                    <div class="table-responsive p-3">
+                        <table class="table align-items-center table-flush table-hover" id="dataTableHover">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Id</th>
+                                    <th>National Id</th>
+                                    <th> Name</th>
+                                    <th>Phone</th>
+                                    <th>Salary</th>
+                                    <th>Village</th>
+                                    @if (roles.Contains("Editor"))
+                                    {
+                                    <th>Edit</th>
+                                    }
+                                    @if (roles.Contains("Admin"))
+                                    {
+                                        
+                                    <th>Delete</th>
+                                    <th>Report</th>
+                                    }
+                                </tr>
+                            </thead>
+                            
+                           <tbody>
+                                @foreach(var item in Model)
+                                {
+                                    <tr id="employee-@item.Id">
+                                        <td>@item.Id</td>
+                                        <td>@item.NationalId</td>
+                                        <td>@item.FirstName @item.LastName </td>
+                                        <td>@item.Telephone</td>
+                                        <td>@item.Salary</td>
+                                        <td>@item.VillageName</td>
+                                       
+                                            @if (roles.Contains("Editor"))
+                                            {
+                                            <td><a class="btn text-success" asp-action="EditEmployee" asp-controller="Employee" asp-route-Id = "@item.Id"><i class="fa fa-solid fa-pen-to-square page-i"></i></a></td>
+                                            }
+                                            @if (roles.Contains("Admin"))
+                                            {
+
+                                            <td><button class="btn text-danger" onclick="insureDeleteEmployee (@item.Id , '@item.FirstName @item.LastName')"><i class="fa fa-solid fa-trash-can page-i"></i></button></td>
+
+                                            <td><a target="_blank" asp-controller="Employee" asp-action="EmployeePrint" asp-route-Id="@item.Id" class="btn text-info"> <i class="fa fa-solid fa-print page-i"></i> </a></td>
+                                           
+                                            }
+                                    </tr>
+                                    
+                                }
+                               
+                           </tbody>
+                        </table>
+
+                        @if (roles.Contains("Admin"))
+                        {
+                        <div class="p-4 " style="text-align:right">
+                            <a target="_blank" asp-controller="Employee" asp-action="AllEmployeePrint" class="btn btn-info p-2"> Download Report <i class="fa fa-solid fa-print page-i"></i> </a>
+
+                        </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    }else{
+        <div class="text-center p-4 "> <h2 class="text-center h2"> No Employees Found Yet </h2></div>
+    }
+
+<script src="~/Template/vendor/datatables/jquery.dataTables.min.js"></script>
+<script src="~/Template/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+    <script>
+    $(document).ready(function () {
+        $('#dataTable').DataTable(); // ID From dataTable
+        $('#dataTableHover').DataTable(); // ID From dataTable with Hover
+    });
+    function insureDeleteEmployee(id , name ){
+
+        let html = `
+        <div class='p-4'>
+            <h2 class='text-center'> Do You Sure for Deleting ${name}</h2>
+            <div class='text-center'><button class='btn btn-danger' onclick='ConfirmDeleteEmployee(${id})'>Delete </button></div>
+        
+        </div>
+        `
+        ShowModal(html)
+    }
+    function ConfirmDeleteEmployee(id){
+        $.ajax({
+            url: "/Employee/DelteEmployee",
+            type:"post",
+            data:{
+                EmployeeId:id
+            },success:(res)=>{
+                if(res.data > 0){
+                    $("#employee-"+id).fadeOut(3000)
+                    setTimeout(() => { $("#employee-" + id).addClass("d-none") }, 4000)
+
+                }else{
+                    $("#error-msg").text("Oh SHit Please Try Again ! ")
+                    setTimeout(() => { $("#error-msg").text("") }, 4000)
+                }
+                EndModal()
+
+            }
+        })
+    }
+
+    //function EditEmployee(id){
+    //    ///Loading()
+    //    $.ajax({
+    //        url: "/Employee/EditEmployee",
+    //        type:"get",
+    //        data:{
+    //            Id:id
+    //        },success:(res)=>{
+    //            //LoadingEnd()
+    //            debugger
+    //            res=`<div>a3000</div>`
+    //            ShowModal(res)
+    //        },error:()=>{
+    //            LoadingEnd()
+
+    //        }
+    //    })
+    //}
+    function ShowModal(html) {
+
+        $(`#MyModal .modal-body`).html(html)
+        $(`#MyModal`).modal("show")
+    }
+
+    </script>

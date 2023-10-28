@@ -1,0 +1,58 @@
+﻿@{
+    int counter = 1;
+}
+<h2 class="p-5 text-center ">
+    Roles 
+</h2>
+
+<div class="container">
+    <div class="role-table">
+
+        <div class="p-4">
+            <button class="btn btn-primary" onclick="AddRole()"> Add Role <i class="fa fa-solid fa-plus"></i> </button>
+        </div>
+        @if(ViewBag.Roles is not null && ViewBag.Roles.Count >0 )
+        {
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <td>#</td>
+                        <td>Role</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(var item in ViewBag.Roles)
+                    {
+                        <tr>
+                            <td>
+                                @(counter++)
+                            </td> 
+                            <td>
+                                @item.Name
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+    </div>
+</div>
+
+
+<script>
+    function AddRole(){
+        $.ajax({
+            url:"/Admin/AddRole",
+            data :{
+
+            },
+            type:"get",
+            success:(res)=>{
+                ShowModal(res)
+            }
+
+        })
+
+    }
+</script>

@@ -1,0 +1,158 @@
+﻿@model TaskProject.Models.EmployeeVM
+<div class="container">
+
+        <form asp-action="AddEmployee" asp-controller="Employee" method="post">
+            <div class="row">
+                <div class=" col-12 p-3 text-center text-danger"  asp-validation-summary="All"></div>
+                <div class="col-lg-6 col-sm-12 p-2 ">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">First Name</label>
+                            <input type="text" class="form-control" asp-for="FirstName" id="" aria-describedby="emailHelp" placeholder="Enter First Name">
+                            <span asp-validation-for="FirstName" class="valid-span"></span>
+                            
+                        </div>
+                </div>
+                <div class="col-lg-6 col-sm-12 p-2 ">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Last Name </label>
+                    <input type="text" class="form-control" asp-for="LastName" id="" aria-describedby="emailHelp" placeholder="Enter Last Name">
+                    <span asp-validation-for="LastName" class="valid-span"></span>
+                            
+                        </div>
+                </div>
+
+                <div class="col-lg-6 col-sm-12 p-2 ">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Telephone</label>
+                    <input type="text" class="form-control" asp-for="Telephone" id="" aria-describedby="emailHelp" placeholder="Telephone">
+                    <span asp-validation-for="Telephone" class="valid-span"></span>
+                            
+                        </div>
+                </div>
+
+
+
+                <div class="col-lg-6 col-sm-12 p-2 ">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">National Id</label>
+                        <input type="text" class="form-control" asp-for="NationalId" id="" aria-describedby="emailHelp" placeholder="Enter Nathional Id">
+                        <span asp-validation-for="NationalId" class="valid-span"></span>
+                        <small id="emailHelp" class="form-text text-muted">
+                            We'll never share your Nathional Id 
+                   
+                        </small>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-sm-12 p-2 ">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Salary</label>
+                    <input type="number" class="form-control" asp-for="Salary" id="" aria-describedby="emailHelp" placeholder="Salary">
+                    <span asp-validation-for="Salary" class="valid-span"></span>
+
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-sm-12 p-2 ">
+                    <div class="form-group">
+                        <label for="select2Single">Governate</label>
+                        <select class="select2-single form-control select2-hidden-accessible" name="state" id="governateid" data-select2-id="select2Single" tabindex="-1" aria-hidden="true">
+                        <option value="0"> Select Governate </option>
+                        
+
+                    </select> 
+                       
+                    </div>
+                </div>
+                <div class="col-lg-6 col-sm-12 p-2 ">
+                    <div class="form-group">
+                        <label for="select2Single">City</label>
+                        <select class="select2-single form-control select2-hidden-accessible" name="state" id="cityid" data-select2-id="select2Single" tabindex="-1" aria-hidden="true">
+                        <option value="0"> Select City </option>
+
+                    </select>
+
+                    </div>
+                </div>
+                <div class="col-lg-6 col-sm-12 p-2 ">
+                    <div class="form-group">
+                        <label for="select2Single">Village</label>
+                      <select asp-for="VillageId" class="select2-single form-control select2-hidden-accessible"  id="Villageid" data-select2-id="select2Single" tabindex="-1" aria-hidden="true">
+                        <option value="0"> Select Village </option>
+
+                    </select>
+                    <span asp-validation-for="VillageId" class="valid-span"></span>
+
+                    </div>
+                </div>
+            <div class="text-center col-12 p-3">
+                <button class="btn btn-primary" type="submit"> Submit </button>
+            </div>
+        </form>
+
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+
+ <script>
+
+    $.ajax({
+        url: "/Employee/Governates",
+        type: "post",
+        data: {
+           
+        }, success: (res) => {
+
+            let html = `  <option value="0"> Select Governate </option>`
+            if (res.length > 0) {
+                $.each(res, (i, e) => {
+                    html += `<option value='${e.id}'> ${e.nameAr}</option>`
+                })
+            }
+                $("#governateid").html(html)
+        }
+    })
+    $("#governateid").change(()=>{
+        let val = $("#governateid").val();
+        $.ajax({
+            url:"/Employee/Cities",
+            type:"post",
+            data:{
+                    GovernateId: val
+            },success:(res)=>{
+                console.log(res)
+                let html = `  <option value="0"> Select City </option>`
+             
+                if(res.length > 0 ){
+                    $.each(res,(i,e)=>{
+                    html += `<option value='${e.id}'> ${e.nameAr}</option>`
+                    })
+                }
+                $("#cityid").html( html)
+            }
+        })
+    
+    })  
+    $("#cityid").change(() => {
+        let val = $("#cityid").val();
+        $.ajax({
+            url:"/Employee/Villages",
+            type:"post",
+            data:{
+                    CityId: val
+            },success:(res)=>{
+                let html = `  <option value="0"> Select Village </option>`
+
+                if (res.length > 0) {
+                    $.each(res,(i,e)=>{
+                        html += `<option value='${e.id}'> ${e.nameAr}</option>`
+                    })
+
+                }
+                    $("#Villageid").html(html)
+            }
+        })
+    
+    })
+</script>

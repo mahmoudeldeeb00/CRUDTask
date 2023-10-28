@@ -1,0 +1,73 @@
+﻿<style>
+    .disabled{
+        pointer-events:none
+    }
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-12 text-center p-3 ">@ViewBag.UserName  Roles </div>
+            <span class="text-body"> Roles Use In  </span>
+        <div class="col-12" id="userroles">
+            @foreach(string item in ViewBag.UserRoles)
+            {
+                <button id="role-@item" data-content="@item" class="btn btn-success " style="margin:10px" onclick="ChangeUserRoles(this,'@item')"> @item</button>
+            }
+        </div>
+            <span class="text-body"> Roles Use Out  </span>
+        <div class="col-12" id="notuserroles">
+
+            @foreach (string item in ViewBag.NotUserRoles)
+            {
+                <button id="role-@item" data-content="@item" class="btn btn-danger " style="margin:10px" onclick="ChangeUserRoles(this,'@item')"> @item</button>
+            }
+        </div>
+        <div class="col-12 text-center "> <button class="btn btn-primary disabled" onclick="submiteditRoles('@ViewBag.UserName')" id="submit-btn"> Submit  </button>  </div>
+    </div>
+
+</div>
+
+<script>
+    function ChangeUserRoles(ele,id) {
+        
+        if ($(ele).parent().attr("id") == "userroles"){
+            $(ele).removeClass("btn-success")
+            $(ele).addClass("btn-danger")
+            $("#notuserroles").append(ele)
+            $("#userroles #item-" + id).remove()
+           
+        }else{
+
+            $(ele).removeClass("btn-danger")
+            $(ele).addClass("btn-success")
+            $("#userroles").append(ele)
+        }
+        $("#submit-btn").removeClass("disabled")
+    }  
+    
+    function submiteditRoles( username ){
+        let roles = []
+        let btns = $("#userroles button")
+        $.each(btns,(i,e)=>{
+            roles.push($(e).attr("data-content"))
+        })
+       
+
+
+                EndModal();
+        Loading()
+        $.ajax({
+            url: "/Admin/EditUserRole",
+            type:"post",
+            data:{
+                UserName : username , 
+                NewRoles : roles
+            },success:(res)=>{
+                 LoadingEnd()
+            },error:()=>{
+               LoadingEnd()
+
+            }
+        })
+    }
+  
+</script>
